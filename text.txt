@@ -1,0 +1,83 @@
+#include<iostream>
+using namespace std;
+
+#define N 105
+int m[N][N];//运算代价 
+int s[N][N];//最优切割 
+int p[N];//矩阵的行列数 
+void Chain(int n) //dp 
+{
+	for (int i = 1; i <= n; i++) m[i][i] = 0;//一个矩阵 
+	for (int r = 2; r <= n; r++)//r标定参与乘法的矩阵个数 
+	{
+		for (int i = 1; i <= n - r + 1; i++)//i是开始矩阵的下标 
+		{
+			int j = i + r - 1;
+			m[i][j] = m[i + 1][j] + p[i - 1] * p[i] * p[j];
+			s[i][j] = i;
+			for (int k = i + 1; k < j; k++)
+			{
+				int temp = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];
+				if (temp < m[i][j]) //寻找最优解 
+				{
+					m[i][j] = temp;
+					s[i][j] = k;
+				}
+			}
+		}
+	}
+}
+void print(int i, int j, int t)//打印序列 
+{
+	if (i == j) cout << "A" << i;//相等输出该矩阵 
+	else {
+		if (t != 0)
+			cout << "(";//一层括号 
+		print(i, s[i][j], t + 1);//递归调用 
+		print(s[i][j] + 1, j, t + 1);
+		if (t != 0)
+			cout << ")";
+	}
+}
+int main()
+{
+	int n;
+	cout << "输入矩阵连乘规模" << endl;
+	cin >> n;
+	cout << endl;
+	cout << "输入行列数" << endl;
+	for (int i = 0; i <= n; i++)
+	{
+		cin >> p[i];
+	}
+	Chain(n);
+	cout << endl;
+	cout << "数组m为：" << endl;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			cout << m[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+	cout << "数组S为：" << endl;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			cout << s[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+	cout << "最少乘法次数为：" << endl;
+	cout << m[1][n] << endl;
+	cout << endl;
+	cout << "最优计算次序为：" << endl;
+	print(1, n, 0);
+	cout << endl;
+	system("pause");
+	return 0;
+}
